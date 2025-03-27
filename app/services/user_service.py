@@ -1,37 +1,61 @@
-from app.models.user import UserCreate, UserResponse, UserDB
+from sqlalchemy.orm import Session
+from app.models.user import User
 from app.services.auth.auth_service import hash_password, verify_password
+from app.models.user import UserCreate, UserResponse
 from datetime import datetime
 
-# Base de datos simulada (diccionario en memoria)
-FAKE_DB = {}
-
-def create_user(user_data: UserCreate) -> UserResponse:
+def create_user(db: Session, user_data: UserCreate) -> UserResponse:
     """Registra un nuevo usuario con contraseña encriptada."""
     
-    hashed_password = hash_password(user_data.password)  
-    user_id = len(FAKE_DB) + 1  
-
-    new_user = UserDB(
-        id=user_id,
-        fecha_registro=datetime.utcnow(),
-        hashed_password=hashed_password,
-        **user_data.dict(exclude={"password"})  # Excluye la contraseña en texto plano
+    # Hashear la contraseña
+    hashed_password = hash_password(user_data.password)
+    
+    # Crear el nuevo usuario
+    db_user = User(
+        nombre=user_data.nombre,
+        email=user_data.email,
+        username=user_data.username,
+        telefono=user_data.telefono,
+        fecha_nacimiento=user_data.fecha_nacimiento,
+        activo=user_data.activo,
+        hashed_password=hashed_password
+    )
+    
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    
+    return UserResponse(
+        id=db_user.id,
+        nombre=db_user.nombre,
+        email=db_user.email,
+        username=db_user.username,
+        telefono=db_user.telefono,
+        fecha_nacimiento=db_user.fecha_nacimiento,
+        activo=db_user.activo,
+        fecha_registro=db_user.fecha_registro
     )
 
-    FAKE_DB[user_id] = new_user  # Guarda el usuario en la "DB"
-    
-    return UserResponse(**new_user.dict())
-
-def get_user_by_id(user_id: int) -> UserResponse | None:
+def get_user_by_id(db: Session, user_id: int) -> UserResponse | None:
     """Obtiene un usuario por ID."""
-    user = FAKE_DB.get(user_id)
-    return UserResponse(**user.dict()) if user else None
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if db_user:
+        return UserResponse(
+            id=db_user.id,
+            nombre=db_user.nombre,
+            email=db_user.email,
+            username=db_user.username,
+            telefono=db_user.telefono,
+            fecha_nacimiento=db_user.fecha_nacimiento,
+            activo=db_user.activo,
+            fecha_registro=db_user.fecha_registro
+        )
+    return None
 
-def authenticate_user(username: str, password: str) -> UserDB | None:
+def authenticate_user(db: Session, username: str, password: str) -> User | None:
     """Autentica un usuario verificando su contraseña."""
     
-    for user in FAKE_DB.values():
-        if user.username == username and verify_password(password, user.hashed_password):
-            return user  # Usuario autenticado
-    
-    return None  # Credenciales incorrectas
+    db_user = db.query(User).filter(User.username == username).first()
+    if db_user and verify_password(password, db_user.hashed_password):
+        return db_user
+    return None
