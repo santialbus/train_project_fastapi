@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Form
-from app.models.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse
 from app.services import user_service
 from app.services.auth import auth_service
 from datetime import timedelta

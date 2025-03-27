@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.services.auth.auth_service import hash_password, verify_password
-from app.models.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse
 from datetime import datetime
 
 def create_user(db: Session, user_data: UserCreate) -> UserResponse:
