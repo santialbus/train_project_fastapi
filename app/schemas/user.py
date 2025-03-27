@@ -1,4 +1,5 @@
-from pydantic import BaseModel, EmailStr
+from fastapi import Depends
+from pydantic import BaseModel, EmailStr, model_validator
 from datetime import date, datetime
 from typing import Optional
 

@@ -3,9 +3,26 @@ from app.models.user import User
 from app.services.auth.auth_service import hash_password, verify_password
 from app.schemas.user import UserCreate, UserResponse
 from datetime import datetime
+from fastapi import HTTPException, status
 
 def create_user(db: Session, user_data: UserCreate) -> UserResponse:
     """Registra un nuevo usuario con contraseña encriptada."""
+
+    # Verificamos si el nombre de usuario ya está en uso
+    existing_user_by_username = get_user_by_username(db, user_data.username)
+    if existing_user_by_username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El nombre de usuario ya está en uso"
+        )
+
+    # Verificamos si el correo electrónico ya está en uso
+    existing_user_by_email = get_user_by_email(db, user_data.email)
+    if existing_user_by_email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El correo electrónico ya está en uso"
+        )
     
     # Hashear la contraseña
     hashed_password = hash_password(user_data.password)
@@ -59,3 +76,11 @@ def authenticate_user(db: Session, username: str, password: str) -> User | None:
     if db_user and verify_password(password, db_user.hashed_password):
         return db_user
     return None
+
+def get_user_by_username(db: Session, username: str):
+    """Obtiene un usuario por su nombre de usuario"""
+    return db.query(User).filter(User.username == username).first()
+
+def get_user_by_email(db: Session, email: str):
+    """Obtiene un usuario por su correo electrónico"""
+    return db.query(User).filter(User.email == email).first()

@@ -19,7 +19,11 @@ def get_db():
 # **1️⃣ Endpoint para registrar usuario**
 @router.post("/users/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    return user_service.create_user(db=db, user_data=user)
+    try:
+        new_user = user_service.create_user(db=db, user_data=user)
+        return UserResponse.from_orm(new_user)
+    except HTTPException as e:
+        raise e 
 
 # **2️⃣ Endpoint para obtener usuario por ID**
 @router.get("/users/{user_id}", response_model=UserResponse)
