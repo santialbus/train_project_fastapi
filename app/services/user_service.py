@@ -8,7 +8,6 @@ from fastapi import HTTPException, status
 def create_user(db: Session, user_data: UserCreate) -> UserResponse:
     """Registra un nuevo usuario con contraseña encriptada."""
 
-    # Verificamos si el nombre de usuario ya está en uso
     existing_user_by_username = get_user_by_username(db, user_data.username)
     if existing_user_by_username:
         raise HTTPException(
@@ -16,7 +15,6 @@ def create_user(db: Session, user_data: UserCreate) -> UserResponse:
             detail="El nombre de usuario ya está en uso"
         )
 
-    # Verificamos si el correo electrónico ya está en uso
     existing_user_by_email = get_user_by_email(db, user_data.email)
     if existing_user_by_email:
         raise HTTPException(
@@ -24,10 +22,8 @@ def create_user(db: Session, user_data: UserCreate) -> UserResponse:
             detail="El correo electrónico ya está en uso"
         )
     
-    # Hashear la contraseña
     hashed_password = hash_password(user_data.password)
     
-    # Crear el nuevo usuario
     db_user = User(
         nombre=user_data.nombre,
         email=user_data.email,

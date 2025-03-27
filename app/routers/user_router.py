@@ -8,7 +8,6 @@ from app.database import SessionLocal
 
 router = APIRouter()
 
-# Función para obtener la sesión de la base de datos
 def get_db():
     db = SessionLocal()
     try:
@@ -16,7 +15,6 @@ def get_db():
     finally:
         db.close()
 
-# **1️⃣ Endpoint para registrar usuario**
 @router.post("/users/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
@@ -24,8 +22,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         return UserResponse.from_orm(new_user)
     except HTTPException as e:
         raise e 
-
-# **2️⃣ Endpoint para obtener usuario por ID**
+    
 @router.get("/users/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     user = user_service.get_user_by_id(db=db, user_id=user_id)
@@ -33,7 +30,6 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return user
 
-# **3️⃣ Endpoint para autenticar y generar token**
 @router.post("/users/login")
 def login_user(
     username: str = Form(...), 
