@@ -1,8 +1,8 @@
+# app/models/user.py
 from sqlalchemy import Column, Integer, String, Date, Boolean, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
-
-Base = declarative_base()
+from app.models.base import Base  # Importamos Base desde aquí
+from sqlalchemy.orm import relationship
 
 class User(Base):
     __tablename__ = "users"
@@ -16,3 +16,6 @@ class User(Base):
     activo = Column(Boolean, default=True)
     hashed_password = Column(String)
     fecha_registro = Column(DateTime, server_default=func.now())
+
+     # Relación con las estaciones favoritas
+    favorite_stations = relationship("FavoriteStation", back_populates="user")
