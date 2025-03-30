@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
+# Modelo para la respuesta de la estación favorita
 class FavoriteStationBase(BaseModel):
     codigo: str
     latitud: Optional[float] = None
@@ -14,5 +15,14 @@ class FavoriteStationBase(BaseModel):
     class Config:
         orm_mode = True
 
+# Modelo para la creación de una estación favorita
 class FavoriteStationCreate(FavoriteStationBase):
-    user_id: int  # ID del usuario que agrega la estación favorita
+    pass
+
+# Modelo para la respuesta al consultar las estaciones favoritas de un usuario
+class FavoriteStation(FavoriteStationBase):
+    id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True
