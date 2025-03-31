@@ -1,8 +1,9 @@
 # app/models/user.py
-from sqlalchemy import Column, Integer, String, Date, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Date, Boolean, DateTime, Enum
 from sqlalchemy.sql import func
 from app.models.base import Base  # Importamos Base desde aquí
 from sqlalchemy.orm import relationship
+from app.models.enums.role import RoleEnum 
 
 class User(Base):
     __tablename__ = "users"
@@ -16,6 +17,6 @@ class User(Base):
     activo = Column(Boolean, default=True)
     hashed_password = Column(String)
     fecha_registro = Column(DateTime, server_default=func.now())
+    role = Column(Enum(RoleEnum), default=RoleEnum.user) 
 
-     # Relación con las estaciones favoritas
     favorite_stations = relationship("FavoriteStation", back_populates="user")
