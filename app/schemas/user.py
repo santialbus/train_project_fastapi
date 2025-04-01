@@ -25,3 +25,7 @@ class UserResponse(UserBase):
         
 class UserDB(UserResponse):
     hashed_password: str 
+
+class LoginCredentials(BaseModel):
+    username: str
+    password: str

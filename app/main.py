@@ -8,8 +8,10 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 origins = [
-    "http://localhost",
-    "http://localhost:8080",  # Add your Flutter app's origin if different
+    "http://localhost",  # Permite el acceso local
+    "http://127.0.0.1",
+    "http://10.0.2.2",
+    "http://192.168.18.86",  # Añadir la IP de tu máquina
 ]
 
 app.add_middleware(
