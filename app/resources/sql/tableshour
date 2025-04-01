@@ -1,0 +1,84 @@
+CREATE TABLE agency (
+    agency_id INT PRIMARY KEY,
+    agency_name VARCHAR(255),
+    agency_url VARCHAR(255),
+    agency_timezone VARCHAR(100),
+    agency_lang VARCHAR(10),
+    agency_phone VARCHAR(50)
+);
+
+CREATE TABLE calendar (
+    service_id VARCHAR(50) PRIMARY KEY,
+    monday BOOLEAN,
+    tuesday BOOLEAN,
+    wednesday BOOLEAN,
+    thursday BOOLEAN,
+    friday BOOLEAN,
+    saturday BOOLEAN,
+    sunday BOOLEAN,
+    start_date DATE,
+    end_date DATE
+);
+
+CREATE TABLE calendar_date (
+    service_id VARCHAR(50),
+    date DATE,
+    exception_type INT,
+    FOREIGN KEY (service_id) REFERENCES calendar (service_id) ON DELETE CASCADE
+);
+
+CREATE TABLE routes (
+    route_id VARCHAR(50) PRIMARY KEY,
+    agency_id INT,
+    route_short_name VARCHAR(100),
+    route_long_name VARCHAR(255),
+    route_desc TEXT,
+    route_type INT,
+    route_url VARCHAR(255),
+    route_color VARCHAR(7),
+    route_text_color VARCHAR(7),
+    FOREIGN KEY (agency_id) REFERENCES agency (agency_id) ON DELETE CASCADE
+);
+
+CREATE TABLE stop_times (
+    trip_id VARCHAR(50),
+    arrival_time TIME,
+    departure_time TIME,
+    stop_id INT,
+    stop_sequence INT,
+    stop_headsign TEXT,
+    pickup_type INT,
+    drop_off_type INT,
+    shape_dist_traveled FLOAT,
+    PRIMARY KEY (trip_id, stop_sequence),
+    FOREIGN KEY (stop_id) REFERENCES stops (stop_id) ON DELETE CASCADE
+);
+
+CREATE TABLE stops (
+    stop_id INT PRIMARY KEY,
+    stop_code VARCHAR(50),
+    stop_name VARCHAR(255),
+    stop_desc TEXT,
+    stop_lat DOUBLE PRECISION,
+    stop_lon DOUBLE PRECISION,
+    zone_id INT,
+    stop_url VARCHAR(255),
+    location_type INT,
+    parent_station INT,
+    stop_timezone VARCHAR(50),
+    wheelchair_boarding INT
+);
+
+CREATE TABLE trips (
+    route_id VARCHAR(50),
+    service_id VARCHAR(50),
+    trip_id VARCHAR(50) PRIMARY KEY,
+    trip_headsign VARCHAR(255),
+    trip_short_name VARCHAR(100),
+    direction_id INT,
+    block_id INT,
+    shape_id INT,
+    wheelchair_accessible INT,
+    FOREIGN KEY (route_id) REFERENCES routes (route_id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES calendar (service_id) ON DELETE CASCADE
+);
