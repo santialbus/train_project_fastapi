@@ -1,0 +1,104 @@
+SELECT 
+    t.trip_id, 
+    (SELECT s.stop_name 
+     FROM stops s
+     JOIN stop_times st ON s.stop_id = st.stop_id
+     WHERE st.trip_id = t.trip_id 
+       AND s.stop_name LIKE '%Alicante%'
+     ORDER BY st.stop_sequence ASC
+     LIMIT 1) AS first_stop_name,
+    (SELECT st.stop_sequence 
+     FROM stop_times st
+     JOIN stops s ON s.stop_id = st.stop_id
+     WHERE st.trip_id = t.trip_id 
+       AND s.stop_name LIKE '%Alicante%'
+     ORDER BY st.stop_sequence ASC
+     LIMIT 1) AS first_stop_sequence,
+
+    (SELECT st.arrival_time 
+     FROM stop_times st
+     JOIN stops s ON s.stop_id = st.stop_id
+     WHERE st.trip_id = t.trip_id 
+       AND s.stop_name LIKE '%Alicante%'
+     ORDER BY st.stop_sequence ASC
+     LIMIT 1) AS first_arrival_time,
+    (SELECT st.departure_time 
+     FROM stop_times st
+     JOIN stops s ON s.stop_id = st.stop_id
+     WHERE st.trip_id = t.trip_id 
+       AND s.stop_name LIKE '%Alicante%'
+     ORDER BY st.stop_sequence ASC
+     LIMIT 1) AS first_departure_time,
+    (SELECT s.stop_name 
+     FROM stops s
+     JOIN stop_times st ON s.stop_id = st.stop_id
+     WHERE st.trip_id = t.trip_id 
+       AND s.stop_name NOT LIKE '%Alicante%'
+       AND st.stop_sequence > 
+           (SELECT MIN(stop_sequence) 
+            FROM stop_times 
+            JOIN stops ON stops.stop_id = stop_times.stop_id 
+            WHERE trip_id = t.trip_id 
+              AND stop_name LIKE '%Alicante%')
+     ORDER BY st.stop_sequence DESC
+     LIMIT 1) AS last_stop_name,
+    (SELECT st.stop_sequence 
+     FROM stop_times st
+     JOIN stops s ON s.stop_id = st.stop_id
+     WHERE st.trip_id = t.trip_id 
+       AND s.stop_name NOT LIKE '%Alicante%'
+       AND st.stop_sequence > 
+           (SELECT MIN(stop_sequence) 
+            FROM stop_times 
+            JOIN stops ON stops.stop_id = stop_times.stop_id 
+            WHERE trip_id = t.trip_id 
+              AND stop_name LIKE '%Alicante%')
+     ORDER BY st.stop_sequence DESC
+     LIMIT 1) AS last_stop_sequence,
+
+    (SELECT st.arrival_time 
+     FROM stop_times st
+     JOIN stops s ON s.stop_id = st.stop_id
+     WHERE st.trip_id = t.trip_id 
+       AND s.stop_name NOT LIKE '%Alicante%'
+       AND st.stop_sequence > 
+           (SELECT MIN(stop_sequence) 
+            FROM stop_times 
+            JOIN stops ON stops.stop_id = stop_times.stop_id 
+            WHERE trip_id = t.trip_id 
+              AND stop_name LIKE '%Alicante%')
+     ORDER BY st.stop_sequence DESC
+     LIMIT 1) AS last_arrival_time,
+    (SELECT st.departure_time 
+     FROM stop_times st
+     JOIN stops s ON s.stop_id = st.stop_id
+     WHERE st.trip_id = t.trip_id 
+       AND s.stop_name NOT LIKE '%Alicante%'
+       AND st.stop_sequence > 
+           (SELECT MIN(stop_sequence) 
+            FROM stop_times 
+            JOIN stops ON stops.stop_id = stop_times.stop_id 
+            WHERE trip_id = t.trip_id 
+              AND stop_name LIKE '%Alicante%')
+     ORDER BY st.stop_sequence DESC
+     LIMIT 1) AS last_departure_time,
+    r.route_short_name
+
+FROM trips t
+JOIN routes r ON t.route_id = r.route_id  
+
+WHERE t.trip_id IN (
+    SELECT DISTINCT trip_id 
+    FROM stop_times st 
+    JOIN stops s ON s.stop_id = st.stop_id 
+    WHERE s.stop_name LIKE '%Alicante%'
+)
+
+AND t.trip_id NOT IN (
+    SELECT trip_id
+    FROM stop_times st
+    JOIN stops s ON s.stop_id = st.stop_id
+    WHERE s.stop_name LIKE '%Alicante%'
+    AND st.stop_sequence = (SELECT MAX(stop_sequence) FROM stop_times WHERE trip_id = t.trip_id)
+);
+
