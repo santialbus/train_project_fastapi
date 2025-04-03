@@ -2,17 +2,18 @@ from fastapi import FastAPI
 from app.routers.data_router import router as data_router
 from app.routers.user_router import router as user_router
 from app.routers.favorite_station_router import router as favorite_station_router
-from app.database import init_db  # Asegúrate de importar la función init_db
+#from app.database import init_db  # Asegúrate de importar la función init_db
 from fastapi.middleware.cors import CORSMiddleware
+import os
+from dotenv import load_dotenv
+
+# Cargar variables del archivo .env
+load_dotenv()
+
+# Obtener los orígenes de CORS desde el .env
+origins = os.getenv("CORS_ORIGINS", "").split(",") 
 
 app = FastAPI()
-
-origins = [
-    "http://localhost",  # Permite el acceso local
-    "http://127.0.0.1",
-    "http://10.0.2.2",
-    "http://192.168.18.86",  # Añadir la IP de tu máquina
-]
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,7 +32,7 @@ app.include_router(favorite_station_router)
 @app.on_event("startup")
 async def startup_event():
     # Inicializa la base de datos
-    init_db()
+    ##init_db()
     
     # Imprime las rutas registradas
     print("Rutas registradas:")

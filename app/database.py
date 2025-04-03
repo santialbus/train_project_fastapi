@@ -1,15 +1,25 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.models.base import Base  # Importamos Base desde aquí
-DATABASE_URL = "sqlite:///./test.db"  # Cambia la URL de la base de datos según tus necesidades
+from dotenv import load_dotenv  # Importa dotenv
+from pathlib import Path
 
-# Crea el motor y la sesión
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+env_path = Path(__file__).resolve().parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL is None:
+    raise ValueError("DATABASE_URL no está definido. Verifica tu archivo .env.")
+
+engine = create_engine(DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Crea todas las tablas en la base de datos
-def init_db():
-    Base.metadata.create_all(bind=engine)
+#def init_db():
+#    Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()
