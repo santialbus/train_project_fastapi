@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.routers.data_router import router as data_router
 from app.routers.user_router import router as user_router
 from app.routers.favorite_station_router import router as favorite_station_router
+from app.routers.trips_router import router as trips_router
 #from app.database import init_db  # Asegúrate de importar la función init_db
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -27,6 +28,7 @@ app.add_middleware(
 app.include_router(data_router)
 app.include_router(user_router)
 app.include_router(favorite_station_router)
+app.include_router(trips_router)
 
 # Inicialización de la base de datos al arrancar la aplicación
 @app.on_event("startup")

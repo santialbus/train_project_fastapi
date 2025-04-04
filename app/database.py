@@ -5,6 +5,9 @@ from app.models.base import Base  # Importamos Base desde aquí
 from dotenv import load_dotenv  # Importa dotenv
 from pathlib import Path
 
+
+from app.models.base import Base  # Importamos Base correctamente
+
 env_path = Path(__file__).resolve().parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
